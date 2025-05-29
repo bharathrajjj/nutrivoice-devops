@@ -2,51 +2,33 @@ pipeline {
     agent any
 
     environment {
-        SONAR_TOKEN = credentials('sonar-token')
+        SONAR_TOKEN = credentials('sonar-token')  // Use the ID from Jenkins credentials
     }
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/bharathrajjj/nutrivoice-devops.git'
+            }
+        }
+
+        stage('Install Dependencies') {
             steps {
                 sh 'npm install'
             }
         }
 
-        stage('Test') {
+        stage('Run Tests') {
             steps {
                 sh 'npm test'
             }
         }
 
-        stage('Code Quality') {
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('MySonarQube') {
-                    sh 'npx sonar-scanner'
+                    sh 'npx sonar-scanner -Dsonar.projectKey=nutrivoice -Dsonar.sources=. -Dsonar.login=$SONAR_TOKEN'
                 }
-            }
-        }
-
-        stage('Security') {
-            steps {
-                sh 'npm audit --json || true'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh 'docker build -t nutrivoice-app .'
-            }
-        }
-
-        stage('Release') {
-            steps {
-                echo 'Promoting to Production (simulated)'
-            }
-        }
-
-        stage('Monitoring') {
-            steps {
-                echo 'Monitoring simulation...'
             }
         }
     }
