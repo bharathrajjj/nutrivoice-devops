@@ -14,20 +14,20 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                bat 'npm test'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('MySonarQube') {
-                    sh 'npx sonar-scanner -Dsonar.projectKey=nutrivoice -Dsonar.sources=. -Dsonar.login=$SONAR_TOKEN'
+                    bat 'npx sonar-scanner -Dsonar.projectKey=nutrivoice -Dsonar.sources=. -Dsonar.login=$SONAR_TOKEN'
                 }
             }
         }
